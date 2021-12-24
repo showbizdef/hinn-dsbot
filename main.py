@@ -111,19 +111,19 @@ async def clear(ctx, amount=100):
 @commands.has_permissions(administrator = True)
 async def kick( ctx, member: discord.Member, *, reason=None):
     await member.kick(reason=reason)
-    await ctx.send(embed = discord.Embed(description = f'**Користувача {member} вигнали за причиною** ' + reason + '**'))
+    await ctx.send('**Користувача {member} вигнали за причиною** ' + reason + '**')
 
 @client.command()
 @commands.has_permissions(administrator = True)
 async def warn(ctx, member: discord.Member, *, reason=None):
-	await ctx.send(embed = discord.Embed(description = f'**Користувача {member} попереджено .**'))
+	await ctx.send (f'**Користувача {member} попереджено .**')
 
 @client.command()
 @commands.has_permissions(administrator = True)
 async def ban( ctx, member: discord.Member, *, reason=None):
     await ctx.channel.purge(limit=1)
     await member.ban(reason=reason)
-    await ctx.send(embed = discord.Embed(description = f'Користувача {member} заблоковано за причиною ' + reason + '.'))
+    await ctx.send(f'Користувача {member} заблоковано за причиною ' + reason + '.')
 
 @client.command(pass_context = True)
 @commands.has_permissions(administrator = True)
