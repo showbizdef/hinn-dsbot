@@ -34,9 +34,7 @@ import random
 from datetime import datetime
 from googlesearch import search 
 from dotenv import load_dotenv
-import youtube_dl
 import datetime
-import asyncpraw
 
 
 
