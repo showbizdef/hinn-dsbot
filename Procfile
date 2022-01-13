@@ -1,1 +1,1 @@
-worker: python hinochka.py
+worker: python main.py
