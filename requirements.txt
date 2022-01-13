@@ -1,5 +1,5 @@
 absl-py==1.0.0
-aiohttp==3.8.0
+aiohttp==3.6.1
 aiosignal==1.2.0
 altgraph==0.17.2
 aoku==2.3.0
