@@ -55,7 +55,7 @@ from discord.ext import commands
 
 
 custom_prefixes = {}
-default_prefixes = ['h?']
+default_prefixes = ['h!']
 
 
 async def determine_prefix(client, message):
@@ -67,12 +67,14 @@ async def determine_prefix(client, message):
         return default_prefixes
 
 
-colors = [0x635942]
+colors = [0x8592aa]
 
-intents = discord.Intents.default()
-intents.members = True
+
+
 intents = discord.Intents().all()
-client = commands.Bot(command_prefix = determine_prefix,)
+intents.members = True
+client = discord.Client(intents=intents)
+client = commands.Bot(command_prefix = determine_prefix, intents=intents)
 client.remove_command("help")
 
 api_key = "89756129ff31a0ca6891bdc0048668bf"
@@ -100,18 +102,19 @@ pp = [
 
 random_resp = random.choice(pp)
 
+guild_welcome = {929114606130049086}
 
 @client.event
 async def on_ready():
     while True:
          time = str(datetime.datetime.now().time().hour) + ':' + str(datetime.datetime.now().time().minute)
-         await client.change_presence(status=discord.Status.idle, activity=discord.Game(f"оновлення! h?help"))
+         await client.change_presence(status=discord.Status.online, activity=discord.Game(f"помер від крінжі"))
     
 
 @client.event
 async def on_guild_join(guild):
-    emb = discord.Embed(title = f'Всім привіт, дякую що додали мене на сервер {guild.name}😄', description = f'Я Хінн. Крінжовенький україномовний бот з непоганим функціоналом. В мій асортимент входить модераційний, утилітний, та розважальний розділ.', color = 0x635942)
-    emb.add_field(name = 'Трішки інформації про мене:', value = 'Мій префікс: **h?** але ви зможете його змінити за потребою\nІнформація про мене: **h?hinn**\nКоманда для списку команд: **h?help**\nПриємного користування, якщо я вам звісно стану у пригоді :D')
+    emb = discord.Embed(title = f'Всім привіт, дякую що додали мене на сервер {guild.name}😄', description = f'Я Хінн. Крінжовенький україномовний бот з непоганим функціоналом. В мій асортимент входить модераційний, утилітний, та розважальний розділ.', color = 0x8592aa)
+    emb.add_field(name = 'Трішки інформації про мене:', value = 'Мій префікс: **h!** але ви зможете його змінити за потребою\nІнформація про мене: **h?hinn**\nКоманда для списку команд: **h?help**\nПриємного користування, якщо я вам звісно стану у пригоді :D')
     emb.set_image(url = 'https://cdn.discordapp.com/attachments/924403524987682826/926977339756261436/hinnstartlogo.png')
     emb.set_footer(text = 'Хінн | 2022 ', icon_url = 'https://cdn.discordapp.com/attachments/925461149359673427/926927760088260628/d7f2a5c1f921583e90f373455589fcf8.jpg')
     await guild.text_channels[0].send(embed = emb)
@@ -120,7 +123,7 @@ async def on_guild_join(guild):
 async def meme(ctx):
     content = get("https://meme-api.herokuapp.com/gimme").text
     data = json.loads(content,)
-    meme = discord.Embed(title=f"{data['title']}", color = 0x635942).set_image(url=f"{data['url']}")
+    meme = discord.Embed(title=f"Ух ти, захотіли рандомного мема з назвою {data['title']}?😲", color = 0x8592aa).set_image(url=f"{data['url']}")
     await ctx.reply(embed=meme)
 
 
@@ -129,50 +132,61 @@ async def meme(ctx):
 @commands.has_permissions( administrator = True )
 async def clear(ctx, amount=100):
     await ctx.channel.purge(limit=amount)
-    await ctx.send(embed = discord.Embed(description = f'**Очистка чату пройшла успішно.**', color = 0x635942))
+    clear = discord.Embed(title = '🧼Здав ЗНО по прибиранні', description = 'Готовий похвалитись, я почистив цей чат😎', color = 0x8592aa)
+    await ctx.send(embed=clear)
 
 
 @client.command()
 @commands.has_permissions(kick_members = True)
-async def kick( ctx, member: discord.Member, *, reason=None):
-    await ctx.message.delete()
+async def kick( ctx, member: discord.Member, *, reason=None, guild: discord.Guild):
     try:
-            await member.kick(reason=reason)
-            await ctx.send(embed = discord.Embed(description = f'**{member} вигнали за причиною ' + reason + ' радіємо хлопці та дівчата!**', color = 0x635942))
-            embed = discord.Embed(title = 'Вас вигнали з серверу ')
+        bot_id = "<@923260509724213288>"
+        author = ctx.author
+        await member.kick(reason=reason)
+        await ctx.send(emb = discord.Embed(description = f'**{member} вигнали за причиною ' + reason + ' радіємо хлопці та дівчата!**', color = 0x8592aa))
+        embed = discord.Embed(title = f'Вас вигнали з серверу {guild}')
+        await member.send(embed = embed)
+
     except discord.DiscordException:
-        author = ctx.message.author
-        emb = discord.Embed(title = '❌Помилка команди kick', description = f'{author}, для успішного виконання команди `kick` ви ввели недостатньо аргументів.', color = 0x635942)
-        emb.add_field(name = 'Використовуйте команду `kick` за таким зразком:', value = '```h?kick @member reason```')
-        emb.set_image('https://cdn.discordapp.com/attachments/924403524987682826/926894454101639168/8485-discord-employee.png')
-        await ctx.send(embed = emb)
+        embed_no_arg = discord.Embed(title = f'Таакс, щось тут пішло не так👀', description = f'{author}, щось мені здається що для виконання цієї команди недостатньо аргументів, якщо я не відповідаю то...\nКікніть користувача правою кнопкою миші', color = 0x627bad)
+        await ctx.send(embed = embed_no_arg)
+            
         
-#0x635942
+#0x8592aa
 
 @client.command()
 @commands.has_permissions(ban_members = True)
-async def ban( ctx, member: discord.Member, *, reason=None):
+async def ban( ctx, user_id: int, *, reason=None, member: discord.Member):
     await ctx.channel.purge(limit=1)
-    await member.ban(reason=reason)
-    await ctx.send(embed = discord.Embed(description = f'**{member} забанили за причиною ' + reason + '.**', color = 0x635942))
+    author = ctx.author
+    try:
+        await ctx.guild.ban(reason=reason)
+        await ctx.send(embed = discord.Embed(description = f'**{user_id} забанили за причиною ' + reason + '.**', color = 0x8592aa))
+        if SEND_PUNISHMENT_PERSONAL_MESSAGE:
+            await user.send(embed = discord.Embed(description = f'**F, вас забанили**', color = 0x8592aa))
+    except discord.DiscordException:
+            no_user = discord.Embed(title = 'ех, рідний тернопіль', description = 'Щось мені здається, що мені недостатньо аргументів для виконнаня бану🤔', color = 0x8592aa)
+            await ctx.send(embed = no_user)
+
+   
 
 @client.command(name='unban')
 @commands.has_permissions(administrator=True)
-async def unban(ctx, *, user_id: int):
+async def unban(ctx, *, user_id: int, member: discord.Member, guild: discord.Guild):
         await ctx.message.delete()
         try:
             user = await client.fetch_user(user_id=user_id)
             await ctx.guild.unban(user)
-            await ctx.send(embed = discord.Embed(description = f'**Користувач з ID {user_id} успішно розбанений.**', color = 0x635942))
+            await ctx.send(embed = discord.Embed(description = f'**Користувач з ID {user_id} успішно розбанений.**', color = 0x8592aa))
             if SEND_PUNISHMENT_PERSONAL_MESSAGE:
-                await user.send(embed = discord.Embed(description = f'**Вас успішно розбанено на сервері!**', color = 0x635942))
+                await user.send(embed = discord.Embed(description = f'**Вас успішно розбанено на сервері!**', color = 0x8592aa))
         except discord.DiscordException:
-            await ctx.send(embed = discord.Embed(description = f'**Користувач з ID {user_id} не забанений, тому не може бути розбаненим.**', color = 0x635942))
+            await ctx.send(embed = discord.Embed(description = f'**Користувач з ID {user_id} не забанений, тому не може бути розбаненим.**', color = 0x8592aa))
 
 @client.command()
 async def userinfo(ctx,member:discord.Member):
     try:
-        emb = discord.Embed(title=f'Про {member}',color=0x635942)
+        emb = discord.Embed(title=f'Про {member}',color=0x8592aa)
         emb.add_field(name="Приєднався на сервер:",value=member.joined_at,inline=False)
         emb.add_field(name='Нікнейм:',value=member.display_name,inline=False)
         emb.add_field(name='Айді:',value=member.id,inline=False)
@@ -181,7 +195,7 @@ async def userinfo(ctx,member:discord.Member):
         await ctx.send(embed = emb)
     except discord.DiscordException:
         author = ctx.message.author
-        await ctx.send(embed = discord.Embed(description = f'{author}, недостатньо аргументів для виконання цієї команди!', color = 0x635942))
+        await ctx.send(embed = discord.Embed(description = f'{author}, недостатньо аргументів для виконання цієї команди!', color = 0x8592aa))
     
 
 @client.command(pass_context = True)
@@ -192,31 +206,23 @@ async def mute(ctx, member: discord.Member):
     mute_role = discord.utils.get(ctx.message.guild.roles, name = 'mute')
 
     await member.add_roles(mute_role)
-    await ctx.send(embed = discord.Embed(description = f'Користувача {member.mention} замьючено.', colour = 0x635942))
+    await ctx.send(embed = discord.Embed(description = f'Користувача {member.mention} замьючено.', colour = 0x8592aa))
 
 @client.command()
 async def avatar(ctx, *,  member:discord.Member):
     author = ctx.message.author
-    emb = discord.Embed(title = f'Аватар для {author}', color = 0x635942)
+    emb = discord.Embed(title = f'Аватар для {author}', color = 0x8592aa)
     emb.set_image(url=member.avatar_url)
+    emb.set_footer(text = 'Виглядає гарно')
     await ctx.send(embed = emb)
 
 
-@client.command()
-@commands.has_permissions(administrator = True)
-async def delete_channels(ctx):
-    emb = discord.Embed(title = 'Ви впевнені?', description = "Через велику кількість скарг ми обмежили користування цією командою. Ми не хотіли щоб сервери постраждали від нашої команди яка мала рятувати а не ламати гільдії над якими всю душу вкладали :(", color = 0x635942)
-    emb.set_image(url = 'https://cdn.discordapp.com/attachments/924403524987682826/925124257615335424/obamahamburger.png')
-    await ctx.send(embed = emb)
-    embed = discord.Embed(title = 'Не падайте у відчай!', description = f'Серед моїх команд є одна таємна яка призначена для екстрених ситуацій, і вона має назву `h?klancygay` яка видаляє якраз всі команди але завжди майте при собі шаблон серверу!', color = 0x635942)
-    embed.set_image(url = 'https://cdn.discordapp.com/attachments/924403524987682826/926975423089373274/secret.png')
-    await ctx.send(embed = embed)
 
 @client.command()
 async def hinn(ctx):
-  emb = discord.Embed(title = 'Інформація про бота Хінн:', url='hhttps://discord.com/api/oauth2/authorize?client_id=923260509724213288&permissions=8&scope=bot', colour = 0x635942)
-  emb.add_field(name = 'Розробники',value = 'klancyidk#7110, частково !! Yuk1ch#7849')
-  emb.add_field(name = 'Стан:',value = '||реліз чи ні...||')
+  emb = discord.Embed(title = 'Інформація про бота Хінн:', url='https://discord.com/api/oauth2/authorize?client_id=923260509724213288&permissions=8&scope=bot', colour = 0x8592aa)
+  emb.add_field(name = 'Розробники',value = 'klancyidk#7110')
+  emb.add_field(name = 'Стан:',value = 'Стабільна версія 1.2')
   emb.add_field(name = 'Сімейство:', value = 'Посилання: https://discord.gg/trJZmZhAKb ')
   emb.add_field(name = 'ОС:', value = 'Не знаю для кого це потрібно але Windows 10, іноді Ubuntu 20.04')
   emb.add_field(name = 'МП:', value = 'Python 3.8.8')
@@ -224,26 +230,26 @@ async def hinn(ctx):
   emb.add_field(name = 'Мова інтерфейсу:', value = 'Українська, але думаємо над англійською.')
   emb.add_field(name = 'Хостинг бота:',value = '<:Heroku:902583914806259763>Heroku')
   emb.add_field(name = 'Додати мене на свій сервер:', value = 'Тиць на назву ембеду')
-  emb.set_thumbnail(url='https://cdn.discordapp.com/attachments/924403524987682826/926966762736611368/d7f2a5c1f921583e90f373455589fcf8.jpg')
+  emb.set_thumbnail(url='https://cdn.discordapp.com/attachments/924403524987682826/931224522944815124/tumblr_366faa2e093caade0b24db7c22ac0898_39f4ebec_1280.jpg')
   emb.set_footer(text=f"klancyidk ©️ | всі права захищені.")
   await ctx.send(embed=emb)
 
 @client.command()
 async def poll(ctx, *,message,):
     author = ctx.message.author
-    emb = discord.Embed(title=f"Опитування від {author}:",description=f"{message}", colour = 0x635942)
+    emb = discord.Embed(title=f"Опитування від {author}:",description=f"{message}", colour = 0x8592aa)
     msg=await ctx.channel.send(embed=emb)
     await msg.add_reaction("✅")
     await msg.add_reaction("❌")
 
 @client.command()
 async def say(ctx, *, text):
-    await ctx.send(embed = discord.Embed(description = text,  colour = 0x635942))
+    await ctx.send(embed = discord.Embed(description = text,  colour = 0x8592aa))
 
 @client.command()
 async def quote(ctx,*, text,):
     author = ctx.message.author
-    embed = discord.Embed(title = f'Цитата від {author} :pinched_fingers:', color = 0x635942)
+    embed = discord.Embed(title = f'Цитата від {author} :pinched_fingers:', color = 0x8592aa)
     embed.add_field(name = text)
     embed.set_thumbnail(url=author.avatar_url)
     await ctx.send(embed = embed)
@@ -251,64 +257,102 @@ async def quote(ctx,*, text,):
 @client.command()
 async def action(ctx, *, text):
     author = ctx.message.author
-    embed = discord.Embed(title = f'{author}:', description = text, color = 0x635942)
+    embed = discord.Embed(title = f'{author}:', description = text, color = 0x8592aa)
     await ctx.send(embed = embed)
 
 @client.command()
 async def news(ctx, *, text):
     author = ctx.message.author
-    embed = discord.Embed(title = f'Новина від {author}:', description = text, color = 0x635942)
+    embed = discord.Embed(title = f'Новина від {author}:', description = text, color = 0x8592aa)
     await ctx.send(embed = embed)
+
 
 @client.command()
 async def help(ctx):
-    await ctx.send(embed = discord.Embed(description = f'**Вас вітає навігаційне меню Хінна! Розпочнемо подорож!**\n **💻Модераційні команди:**\n`ban`, `unban`, `kick`, `warn`, `mute`\n **📄Інформаційні комаанди:**\n `hinn`, `userinfo`, `serverinfo`\n **💽Утилітні команди:**\n `clear`, `avatar`, `delete_channels`, `ping`, `say`, `action`, `poll`, `find`, `invite`, `nitro`, `weather`, `fox`, `quote`, `news`, `worldmap`, `ukrainemap`, `setprefix`,  \n☠Таймкіллери: \n `minesweeper`, `calc`, `answer`, `ppsize`, `dota`, ', color = 0x635942))
+    page1 = discord.Embed (
+        title = 'Допомагаю!',
+        description = '**💻Модераційні команди:**\n`ban`, `unban`, `kick`, `warn`, `mute`',
+        color = 0x8592aa
+    )
+    page2 = discord.Embed (
+        title = 'Допомагаю! х2',
+        description = '**📄Інформаційні комаанди:**\n `hinn`, `userinfo`, `serverinfo`\n **💽Утилітні команди:**\n `clear`, `avatar`, `ping`, `say`, `action`, `poll`, `google`, `invite`, `nitro`, `weather`, `fox`, `quote`, `news`, `worldmap`, `ukrainemap`, `setprefix`',
+        color = 0x8592aa
+    )
+    page3 = discord.Embed (
+        title = 'Допомагаю... х3',
+        description = '**☠Таймкіллери:** \n `minesweeper`, `calc`, `answer`, `ppsize`, `dota`\n**🎶Співи:** \n `play`, `skip`, `leave`, `loop`, `queue`, `shuffle`, `stop`, `resume`, `join`, `summon`, `volume`\nХінн буде співати лише з префіксом **h!**',
+        color = 0x8592aa
+    )
+    
+    
+
+    
+    
+    pages = [page1, page2, page3,]
+
+    message = await ctx.send(embed = page1)
+    await message.add_reaction('⏮')
+    await message.add_reaction('◀')
+    await message.add_reaction('▶')
+    await message.add_reaction('⏭')
+
+    def check(reaction, user):
+        return user == ctx.author
+
+    i = 0
+    reaction = None
+
+    while True:
+        if str(reaction) == '⏮':
+            i = 0
+            await message.edit(embed = pages[i])
+        elif str(reaction) == '◀':
+            if i > 0:
+                i -= 1
+                await message.edit(embed = pages[i])
+        elif str(reaction) == '▶':
+            if i < 2:
+                i += 1
+                await message.edit(embed = pages[i])
+        elif str(reaction) == '⏭':
+            i = 2
+            await message.edit(embed = pages[i])
+        
+        try:
+            reaction, user = await client.wait_for('reaction_add', timeout = 30.0, check = check)
+            await message.remove_reaction(reaction, user)
+        except:
+            break
+
+
+
 
 
 @client.command()
-async def serverinfo(ctx, guild: discord.Guild = None):
-    guild = ctx.message.guild
-    roles =[role for role in guild.roles]
-    text_channels = [text_channels for text_channels in guild.text_channels]
-    emb = discord.Embed(title=f'{guild.name} ', description="Про сервер:", timestamp=ctx.message.created_at, color=0x635942)
-    emb.set_thumbnail(url=guild.icon_url)
-    emb.add_field(name="Кількість каналів:", value=len(guild.channels))
-    emb.add_field(name="Кількість ролей:", value=len(guild.roles))
-    emb.add_field(name="Кількість бустерів:", value=guild.premium_subscription_count)
-    emb.add_field(name="Учасників:", value=guild.member_count)
-    emb.add_field(name="Сервер створено:", value=guild.created_at)
-    emb.add_field(name="Власник серверу:", value=f"<@{guild.owner_id}>")
-    emb.add_field(name="Системний канал:", value=guild.system_channel)
-    emb.add_field(name="Канал правил / інформація", value=guild.rules_channel)
+async def serverinfo(ctx):
+      guild = ctx.guild
+      embed = discord.Embed(title=f'Сервер {guild}', description="Який чудовий сервер!", timestamp=ctx.message.created_at, color=discord.Color.red())
+      embed.set_thumbnail(url=guild.icon_url)
+      embed.add_field(name="Кількість каналів:", value=len(guild.channels))
+      embed.add_field(name="Ролей:", value=len(guild.roles))
+      embed.add_field(name='Айді серверу:', )
+      embed.add_field(name="Бусти:", value=guild.premium_subscription_count)
+      embed.add_field(name="Кількість учасників:", value=guild.member_count)
+      embed.add_field(name="Сервер створено:", value=guild.created_at)
+      embed.add_field(name="Власник серверу:", value=guild.owner.display_name)
+      embed.set_footer(text=f"Сервером зацікавився {ctx.author}", icon_url=ctx.author.avatar_url)
 
-    await ctx.send(embed=emb)
+      await ctx.send(embed=embed)
+
 
 @client.command()
 async def serveravatar(ctx, guild: discord.Guild = None):
-    emb = discord.Embed(title = f'Аватар серверу {guild.name}', color = 0x635942)
+    emb = discord.Embed(title = f'Аватар серверу {guild.name}', color = 0x8592aa)
     emb.set_image(url=guild.icon_url)
     emb.set_footer(text = 'Який гарний аватар, я б сам собі такий мав :()')
     await ctx.send(embed = emb)
 
-@client.command()
-async def test(ctx):
-    msg = await ctx.send(
-        embed = discord.Embed(title = 'тест?', timestamp = ctx.message.created_at),
-        components = [
-            Button(style = ButtonStyle.green, label = 'так'),
-            Button(style = ButtonStyle.red, label = 'ні')
-        ])
-    responce = await client.wait_for('button_click', check = lambda message: message.author == ctx.author)
-    if responce.component.label == 'так':
-        await responce.respond(content = 'тест буде!')
-    else:
-        await responce.respond(content = 'тесту не буде хехе.')
-
-@client.command()
-async def klancygay(ctx):
-    await ctx.author.send(embed = discord.Embed(title = 'погоджуюсь', description = f'Розпочинаємо чистку!', color = 0x635942))
-    [await channel.delete() for channel in ctx.guild.text_channels]
-    [await channel.delete() for channel in ctx.guild.voice_channels]
 
 @client.command()
 async def qd(ctx):
@@ -320,22 +364,21 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound ):
         emoji = '🤔'
         await ctx.message.add_reaction(emoji)
-        await ctx.author.send(embed = discord.Embed(description = 'Судячи по всьому, ви не можете знайти або нормально написати якусь команду. Напишіть `h?help` для того щоб написати правильно команду або перевірити чи вона взагалі є😉', color = 0x635942))
-    
+        
 
 
 @client.command()      
 async def dota(ctx):
-    emb = discord.Embed(title = f'друже...', color = 0x635942)
+    emb = discord.Embed(title = f'друже...', color = 0x8592aa)
     emb.set_image(url = 'https://i.gifer.com/3njl.gif')
     await ctx.reply(embed = emb)
-    await ctx.author.send(embed = discord.Embed(title = 'Мої вітання!', description = f'Ви використали саму крінжову команду у всьому асортименті Хінна! За це ви отримуєте нічого! Як бачите, й вам щастить😁', color = 0x635942))
+    await ctx.author.send(embed = discord.Embed(title = 'Мої вітання!', description = f'Ви використали саму крінжову команду у всьому асортименті Хінна! За це ви отримуєте нічого! Як бачите, й вам щастить😁', color = 0x8592aa))
 
 @client.command()
 async def nitro(ctx):
-    emb = discord.Embed(title = 'Бажаєте нітро?', description = 'Тримайте, https://bit.ly/3FjXsFu', color = 0x635942)
+    emb = discord.Embed(title = 'Бажаєте нітро?', description = 'Тримайте, https://bit.ly/3FjXsFu', color = 0x8592aa)
     await ctx.reply(embed = emb)
-    await ctx.author.send(embed = discord.Embed(description = f"**Увага!**\nЩодо команди `h?nitro`, команда є максимально жартівливого змісту, ми не несемо відповідальність за ваші особисті дані, якщо ви трохи пізніше побачили підозрілі дії на вашому акаунті - це не стосується нас. **Хінн ніколи не був і не буде розбійником!**\n Дякую за розуміння, ваші деви.", color = 0x635942))
+    await ctx.author.send(embed = discord.Embed(description = f"**Увага!**\nЩодо команди `h!nitro`, команда є максимально жартівливого змісту, ми не несемо відповідальність за ваші особисті дані, якщо ви трохи пізніше побачили підозрілі дії на вашому акаунті - це не стосується нас. **Хінн ніколи не був і не буде розбійником!**\n Дякую за розуміння, ваші деви.", color = 0x8592aa))
     
     
 @client.command()
@@ -344,16 +387,16 @@ async def invite(ctx):
         title="Додати мене на свій сервер",
         description="Радий бачити, що хтось хоче додати мене на сервер!😯",
         url='https://discord.com/api/oauth2/authorize?client_id=923260509724213288&permissions=8&scope=bot',
-        сolor = 0x635942,
+        сolor = 0x8592aa,
     )
     await ctx.reply(embed=embed)
 
 @client.command()
-async def find(ctx,*, query):
+async def google(ctx,*, query):
 		author = ctx.author.mention
 		async with ctx.typing():
 				for j in search(query, tld="co.in", num=1, stop=1, pause=2): 
-						await ctx.send(embed = discord.Embed(description =f"**Хтось вирішив пошукати щось у гуглі не закриваючи дискорд🧐**\nОсь результати твого пошуку, {author} \n {j}", color =0x635942))
+					    await ctx.send(embed = discord.Embed(title = 'Ух ти, хтось вирішив пошукати щось не згортаючи дискорд', description = f'Ось і результати твого пошуку, {author}\n{j}', color = 0x8592aa))
 
 
 @client.command()
@@ -362,7 +405,7 @@ async def calc(ctx, operation:str):
 
 @client.command()
 async def mendeleevtable(ctx):
-        emb = discord.Embed(title="Таблиця Дмитра Івановича Менделєєва", color=0x635942)
+        emb = discord.Embed(title="Таблиця Дмитра Івановича Менделєєва", color=0x8592aa)
         emb.set_image(url="https://cdn.discordapp.com/attachments/871344183988879360/909426071198375976/unknown.png")
         await ctx.send(embed = emb)
 
@@ -371,7 +414,7 @@ async def minesweeper(ctx):
     baka = discord.Embed(description = """**Пограймо в сапер?**)\n||1️⃣|| ||2️⃣|| ||💣|| ||2️⃣|| ||💣||
 ||💣|| ||3️⃣|| ||2️⃣|| ||3️⃣|| ||2️⃣||
 ||3️⃣|| ||💣|| ||1️⃣|| ||1️⃣|| ||💣||
-||💣|| ||2️⃣|| ||1️⃣|| ||1️⃣|| ||1️⃣||""")
+||💣|| ||2️⃣|| ||1️⃣|| ||1️⃣|| ||1️⃣||""", color = 0x8592aa)
     await ctx.send(embed = baka)
 
 @client.command()
@@ -391,8 +434,8 @@ async def weather(ctx, *, city: str):
                 z = x["weather"]
                 weather_description = z[0]["description"]
                 weather_description = z[0]["description"]
-                embed = discord.Embed(title=f"🌦Погода у {city_name}",
-                              color=0x635942,
+                embed = discord.Embed(title=f"🌦Погода у місті {city_name}",
+                              color=0x8592aa,
                               timestamp=ctx.message.created_at,)
                 embed.add_field(name="Опис", value=f"**{weather_description}**", inline=False)
                 embed.add_field(name="Температура(C)", value=f"**{current_temperature_celsiuis}°C**", inline=False)
@@ -406,44 +449,25 @@ async def weather(ctx, *, city: str):
 
 @client.command()
 async def answer(ctx):
-    pp = discord.Embed(title="Хочете моєї відповіді?", description="буде вам моя відповідь...", color = 0x635942)
+    pp = discord.Embed(title="Хочете моєї відповіді?", description="буде вам моя відповідь...", color = 0x8592aa)
     pp.add_field(name="І моя відповідь...", value=random.choice(responses))
 
     await ctx.send(embed=pp)
 
 @client.command()
 async def ppsize(ctx):
-    aboba = discord.Embed(title = "ем, я соромлюсь", description = "проте я скажу...))", color = 0x635942)
-    aboba.add_field(name = "І його/її розмір пісюна...", value = random.choice(pp))
+    aboba = discord.Embed(title = "ем, я соромлюсь", description = "проте я скажу...))", color = 0x8592aa)
+    aboba.add_field(name = "помераю від крінжі", value = random.choice(pp))
     await ctx.send(embed = aboba)
 
-@client.command()
-async def giphy(ctx, *, search):
-    embed = discord.Embed(colour=discord.Colour.blue())
-    session = aiohttp.clientSession()
-
-    if search == '':
-        response = await session.get('https://api.giphy.com/v1/gifs/random?api_key=API_KEY_GOES_HERE')
-        data = json.loads(await response.text())
-        embed.set_image(url=data['data']['images']['original']['url'])
-    else:
-        search.replace(' ', '+')
-        response = await session.get('http://api.giphy.com/v1/gifs/search?q=' + search + '&api_key=API_KEY_GOES_HERE&limit=10')
-        data = json.loads(await response.text())
-        gif_choice = random.randint(0, 9)
-        embed.set_image(url=data['data'][gif_choice]['images']['original']['url'])
-
-    await session.close()
-
-    await ctx.send_message(embed=embed)
 
 @client.command()
 @commands.has_permissions(administrator = True)
 async def warn(ctx, member: discord.Member, *, text):
-    emb = discord.Embed(title="Партія розчарована вами👎", description="Привіт, я Хінн і мені сказали що ви порушуєте правила! На наступний раз старайтесь дотримуватись правил аби не було конфліктів🧐", colour=0x635942)
+    emb = discord.Embed(title="Партія розчарована вами👎", description="Привіт, я Хінн і мені сказали що ви порушуєте правила! На наступний раз старайтесь дотримуватись правил аби не було конфліктів🧐", colour=0x8592aa)
     emb.add_field(name='А дістали ви попередження від:', value=ctx.message.author)
     await member.send(embed = emb)
-    emb = discord.Embed(title = f'Попередження\nА дехто в нас зараз отримає по шапці! {member} отримав попередження за причиною:', description = text, color =0x635942)
+    emb = discord.Embed(title = f'Попередження\nА дехто в нас зараз отримає по шапці! {member} отримав попередження за причиною:', description = text, color =0x8592aa)
     await ctx.send(embed = emb)
 
 
@@ -452,62 +476,72 @@ async def fox(ctx):
     response = requests.get('https://some-random-api.ml/img/fox')
     json_data = json.loads(response.text) 
 
-    emb = discord.Embed(color = 0x635942, title = 'Як просили, картинка з лисичкою😃') 
+    emb = discord.Embed(color = 0x8592aa, title = 'Як просили, картинка з лисичкою😃') 
     emb.set_image(url = json_data['link']) 
     await ctx.send(embed = emb)
 
 @client.command()
 async def ping(ctx):
-    await ctx.reply(embed = discord.Embed(title = 'Понг!', description = f'{client.latency} ms', color = 0x635942))
+    await ctx.reply(embed = discord.Embed(title = 'Понг!', description = f'{client.latency} ms', color = 0x8592aa))
 
 @client.command()
 async def time(ctx):
     time = str(datetime.datetime.now().time().hour) + ':' + str(datetime.datetime.now().time().minute)
-    emb = discord.Embed(title = f'🕰Котра година?', description = f'За моїми розрахунками зараз {time} година!', color = 0x635942)
+    emb = discord.Embed(title = f'🕰Котра година?', description = f'За моїми розрахунками зараз {time} година!', color = 0x8592aa)
     await ctx.reply(embed = emb)
 
 @client.command()
 @commands.guild_only()
 async def setprefix(ctx, *, prefixes=""):
     custom_prefixes[ctx.guild.id] = prefixes.split() or default_prefixes
-    await ctx.send(embed = discord.Embed(title = 'Зміна префікса', description = f'Зміна префікса пройшла успішно👩‍🏭', color = 0x635942))
+    await ctx.send(embed = discord.Embed(title = 'Зміна префікса', description = f'Зміна префікса пройшла успішно👩‍🏭', color = 0x8592aa))
 
 @client.command()
 async def kiss(ctx, *, text):
-    emb = discord.Embed(title = 'Поцілунки', description = text, color = 0x635942)
+    emb = discord.Embed(title = 'Поцілунки', description = text, color = 0x8592aa)
     emb.set_image(url = 'https://acegif.com/wp-content/uploads/anime-kissin-10.gif')
     await ctx.send(embed = emb)
 
 @client.command()
 async def hug(ctx, *, text):
-    emb = discord.Embed(title = 'Обійми🤗', description = text, color = 0x635942)
+    emb = discord.Embed(title = 'Обійми🤗', description = text, color = 0x8592aa)
     emb.set_image(url = 'https://acegif.com/wp-content/gif/anime-hug-52.gif')
     await ctx.send(embed = emb)
 
 @client.command()
 async def slap(ctx, *, text):
-    emb = discord.Embed(title = "Схоже на початок бійки!", description = text, color = 0x635942)
+    emb = discord.Embed(title = "Схоже на початок бійки!", description = text, color = 0x8592aa)
     emb.set_image(url = 'https://tenor.com/view/slap-jjk-nicevagg-anime-gif-22368283')
 
 @client.command()
 async def kill(ctx):
     author = ctx.author.mention
-    emb = discord.Embed(title = f'Як бажаєте, {author} !', color = 0x635942)
+    emb = discord.Embed(title = f'Як бажаєте, {author} !', color = 0x8592aa)
     emb.set_image(url = 'https://i.gifer.com/DU2.gif')
     await ctx.send(embed = emb)
 
 @client.command()
 async def worldmap(ctx):
-    emb = discord.Embed(title = 'Карта світу', color = 0x635942)
+    emb = discord.Embed(title = 'Карта світу', color = 0x8592aa)
     emb.set_image(url = 'https://images.ua.prom.st/2152301041_w640_h640_karta-mira-anglijskaya.jpg')
     await ctx.send(embed = emb)
 
 @client.command()
 async def ukrainemap(ctx):
-    emb = discord.Embed(title = 'Карта України', color = 0x635942)
+    emb = discord.Embed(title = 'Карта України', color = 0x8592aa)
     emb.set_image(url = 'https://artside.com.ua/tmp/cache/images/2b/de8/25002522-630x422-r.jpg')
     await ctx.send(embed = emb)
 
 
-print('піздец робе')
+@client.event
+async def on_member_join(member):
+    channelsadg = client.get_channel(924037553559072769)
+    emb = discord.Embed(title = 'Хтось приєднався до нашого серверу!', color = 0x8592aa)
+    emb.add_field(name = f'Привіт, {member}', value = f'Радий вас бачити на сервері {member.guild.name}, перед початком розмов рекомендую ознайомитись з правилами/рекомендацією  адміністратора.\nПриємного спілкування!')
+    emb.set_thumbnail(url = member.avatar_url)
+    emb.set_image(url = 'https://media.giphy.com/media/9cZQnwdzUXTDG/giphy.gif')
+    await channelsadg.send(embed = emb)
+
+
+print('Урааа! Робе!!!')
 client.run('OTIzMjYwNTA5NzI0MjEzMjg4.YcNbWg.D_b14LzIocpJAEi3X8wK7vmrW9M')

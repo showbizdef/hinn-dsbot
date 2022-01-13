@@ -1,4 +1,4 @@
 import subprocess
 
 subprocess.Popen('python hinochka.py')
-subprocess.Popen('python musica.py')
+subprocess.Popen('python djkavun.py')
